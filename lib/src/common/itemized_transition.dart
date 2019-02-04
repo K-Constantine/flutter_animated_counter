@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:itemized_widget/src/common/itemized_widget_scroll.dart';
+import 'package:itemized_widget/src/common/itemized_widget_direction.dart';
 
 class ItemizedTransition {
   ItemizedTransition(
@@ -20,7 +20,7 @@ class ItemizedTransition {
   final Function update;
   final Function finish;
   final Duration duration;
-  final ItemizedWidgetScroll navigation;
+  final ItemizedWidgetDirection navigation;
 
   CurvedAnimation animation;
   AnimationController controller;

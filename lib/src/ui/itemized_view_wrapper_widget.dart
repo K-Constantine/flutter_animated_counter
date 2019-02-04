@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:itemized_widget/src/common/itemized_widget_scroll.dart';
+import 'package:itemized_widget/src/common/itemized_widget_direction.dart';
 
 class ItemizedViewWrapperWidget extends StatelessWidget {
   ItemizedViewWrapperWidget(
@@ -13,7 +13,7 @@ class ItemizedViewWrapperWidget extends StatelessWidget {
       this.offset = 0.0,
       this.position = 1.0,
       @required this.child,
-      this.formNavigation = ItemizedWidgetScroll.NONE})
+      this.formNavigation = ItemizedWidgetDirection.NONE})
       : super(key: key);
 
   final bool exitIn;
@@ -24,12 +24,13 @@ class ItemizedViewWrapperWidget extends StatelessWidget {
   final double offset;
   final double position;
 
-  final ItemizedWidgetScroll formNavigation;
+  final ItemizedWidgetDirection formNavigation;
 
   final Widget child;
 
   double _getOpacity() {
-    if (exitOut || (entryOut && formNavigation != ItemizedWidgetScroll.NONE)) {
+    if (exitOut ||
+        (entryOut && formNavigation != ItemizedWidgetDirection.NONE)) {
       return 1.0 - position;
     }
     return position;

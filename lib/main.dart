@@ -1,21 +1,27 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:itemized_widget/src/model/counter_model.dart';
-import 'package:itemized_widget/src/model/itemized_model.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:itemized_widget/src/common/itemized_widget_direction.dart';
+import 'package:itemized_widget/src/state/counter_state.dart';
 import 'package:itemized_widget/src/ui/itemized_widget.dart';
-import 'package:providerscope/providerscope.dart';
+import 'package:redux/redux.dart';
 
 void main() => runApp(MyApp());
 
-ProviderScope scope = ProviderScope('my_app_scope');
-ProviderScope widgetScope = ProviderScope('itemized_widget_scope');
+CounterState _reducer(CounterState prev, action) {
+  if (action == ItemizedWidgetDirection.NEXT) {
+    return CounterState(prev.counter + 1);
+  } else if (action == ItemizedWidgetDirection.PREVIOUS) {
+    return CounterState(prev.counter - 1);
+  }
+  return prev;
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Providers providers = Providers()
-      ..provideValue(CounterModel(), scope: scope)
-      ..provideValue(ItemizedModel(), scope: widgetScope);
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -29,10 +35,7 @@ class MyApp extends StatelessWidget {
         // counter didn't reset back to zero; the application is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: ProviderNode(
-        providers: providers,
-        child: MyHomePage(title: 'Flutter Demo Home Page'),
-      ),
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -56,6 +59,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Store<CounterState> store = Store(_reducer, initialState: CounterState(1));
+  StreamController<ItemizedWidgetDirection> _controller =
+      StreamController<ItemizedWidgetDirection>();
+
   @override
   Widget build(BuildContext context) {
     const double padding = 80.0;
@@ -65,78 +72,82 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(bottom: padding),
-              child: Text(
-                'You have pushed the button this many times:',
-              ),
-            ),
-            Provide<CounterModel>(
-              scope: scope,
-              builder: (BuildContext context, Widget child,
-                  CounterModel counterModel) {
-                return ItemizedWidget(
-                  offset: padding,
-                  size: counterModel.counter,
-                  scope: widgetScope,
-                  builder: (position, percentage) {
-                    return Text(
-                      '$position',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.display1,
-                    );
-                  },
-                );
-              },
-            ),
-          ],
+    return StoreProvider<CounterState>(
+      store: store,
+      child: Scaffold(
+        appBar: AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text(widget.title),
         ),
-      ),
-      floatingActionButton: Provide<ItemizedModel>(
-        scope: widgetScope,
-        builder: (BuildContext context, Widget child, ItemizedModel model) {
-          return Provide<CounterModel>(
-            scope: scope,
-            builder: (BuildContext context, Widget child,
-                CounterModel counterModel) {
-              return FloatingActionButton(
-                onPressed: () {
-                  counterModel.increment();
-                  model.next();
+        body: Center(
+          // Center is a layout widget. It takes a single child and positions it
+          // in the middle of the parent.
+          child: Column(
+            // Column is also layout widget. It takes a list of children and
+            // arranges them vertically. By default, it sizes itself to fit its
+            // children horizontally, and tries to be as tall as its parent.
+            //
+            // Invoke "debug painting" (press "p" in the console, choose the
+            // "Toggle Debug Paint" action from the Flutter Inspector in Android
+            // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+            // to see the wireframe for each widget.
+            //
+            // Column has various properties to control how it sizes itself and
+            // how it positions its children. Here we use mainAxisAlignment to
+            // center the children vertically; the main axis here is the vertical
+            // axis because Columns are vertical (the cross axis would be
+            // horizontal).
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(bottom: padding),
+                child: Text(
+                  'You have pushed the button this many times:',
+                ),
+              ),
+              StoreConnector<CounterState, int>(
+                converter: (store) => store.state.counter,
+                builder: (context, counter) {
+                  return ItemizedWidget(
+                    offset: padding,
+                    size: counter,
+                    stream: _controller.stream,
+                    builder: (position, percentage) {
+                      return Text(
+                        '$position',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.display1,
+                      );
+                    },
+                  );
                 },
-                tooltip: 'Increment',
-                child: Icon(Icons.add),
-              );
-            },
-          );
-        },
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+              ),
+            ],
+          ),
+        ),
+        floatingActionButton: StoreConnector<CounterState, VoidCallback>(
+          converter: (store) {
+            return () => store.dispatch(ItemizedWidgetDirection.NEXT);
+          },
+          builder: (context, callback) {
+            return FloatingActionButton(
+              onPressed: () {
+                _controller.add(ItemizedWidgetDirection.NEXT);
+                callback();
+              },
+              tooltip: 'Increment',
+              child: Icon(Icons.add),
+            );
+          },
+        ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.close();
+    super.dispose();
   }
 }

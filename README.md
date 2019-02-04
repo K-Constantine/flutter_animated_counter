@@ -2,7 +2,8 @@
 
 A quick overview of a simple counter Flutter animated app.
 
-![](/K-Constantine/flutter_animated_counter/blob/master/counter.gif?raw=true)
+![](https://raw.githubusercontent.com/K-Constantine/flutter_animated_counter/blob/master/counter.gif?raw=true)
+<img src="https://raw.githubusercontent.com/K-Constantine/flutter_animated_counter/master/counter.gif" width="49%">
 
 ## Getting Started
 

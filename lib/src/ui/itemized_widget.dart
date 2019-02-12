@@ -42,7 +42,6 @@ class _ItemizedWidgetState extends State<ItemizedWidget>
   double percentage;
   ItemizedTransition transition;
 
-  PageController pageController;
   ItemizedNavigationState navigationState;
   Store<ItemizedNavigationState> navigationStore;
   StreamSubscription<ItemizedWidgetDirection> subscription;
@@ -50,7 +49,6 @@ class _ItemizedWidgetState extends State<ItemizedWidget>
   @override
   void initState() {
     super.initState();
-    pageController = PageController();
     navigationState = ItemizedNavigationState(ItemizedWidgetDirection.NONE);
     navigationStore = Store(navigate, initialState: navigationState);
     if (widget.stream != null) {
@@ -129,7 +127,6 @@ class _ItemizedWidgetState extends State<ItemizedWidget>
   @override
   void dispose() {
     subscription.cancel();
-    pageController.dispose();
     super.dispose();
   }
 }

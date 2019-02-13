@@ -36,6 +36,8 @@ class _ItemizedWidgetState extends State<ItemizedWidget>
     with TickerProviderStateMixin {
   _ItemizedWidgetState(int activePage) : this.activePage = activePage {
     percentage = 0.0;
+    navigationState = ItemizedNavigationState(ItemizedWidgetDirection.NONE);
+    navigationStore = Store(navigate, initialState: navigationState);
   }
 
   int activePage;
@@ -49,9 +51,10 @@ class _ItemizedWidgetState extends State<ItemizedWidget>
   @override
   void initState() {
     super.initState();
-    navigationState = ItemizedNavigationState(ItemizedWidgetDirection.NONE);
-    navigationStore = Store(navigate, initialState: navigationState);
-    if (widget.stream != null && subscription == null) {
+    if (subscription != null) {
+      subscription.cancel();
+    }
+    if (widget.stream != null) {
       subscription = widget.stream.listen((direction) {
         navigationStore.dispatch(direction);
       });

@@ -51,7 +51,7 @@ class _ItemizedWidgetState extends State<ItemizedWidget>
     super.initState();
     navigationState = ItemizedNavigationState(ItemizedWidgetDirection.NONE);
     navigationStore = Store(navigate, initialState: navigationState);
-    if (widget.stream != null) {
+    if (widget.stream != null && subscription == null) {
       subscription = widget.stream.listen((direction) {
         navigationStore.dispatch(direction);
       });

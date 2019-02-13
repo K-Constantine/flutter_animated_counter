@@ -9,7 +9,7 @@ import 'package:itemized_widget/src/ui/itemized_view_widget.dart';
 import 'package:itemized_widget/src/ui/itemized_view_wrapper_widget.dart';
 import 'package:redux/redux.dart';
 
-part 'renderer_widget.dart';
+part 'package:itemized_widget/src/ui/renderer_widget.dart';
 
 class ItemizedWidget extends StatefulWidget {
   ItemizedWidget(

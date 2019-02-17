@@ -12,7 +12,7 @@ class ItemizedTransition {
     );
     animation = CurvedAnimation(
         parent: controller,
-        curve: Interval(0.2, 1.0, curve: Curves.fastOutSlowIn))
+        curve: Interval(0.0, 1.0, curve: Curves.fastOutSlowIn))
       ..addListener(onAnimationChange)
       ..addStatusListener(updateAnimationStatus);
   }
